@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
    mongoose.connection.on('connected',()=>console.log("MongoDB Connected"));
-   await mongoose.connect(`${process.env.MONGODB_URI}/Mearn_Authentication`);
+   await mongoose.connect(`${process.env.MONGODB_URI}/Auth`);
 };
 
 export default connectDB;
