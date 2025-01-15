@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import EmailVerify from './pages/EmailVerify'
 import ResetPassword from './pages/ResetPassword'
 
+
 const App = () => {
   return (
     <div>
