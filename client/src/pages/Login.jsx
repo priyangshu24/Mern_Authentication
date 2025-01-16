@@ -1,12 +1,17 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { AppContent } from '../contex/AppContext';
 
 const Login = () => {
   const navigate = useNavigate();
+
+  const {backendUrl,setIsLoggedin} = useContext(AppContent)
+
+
   const [state, setState] = useState('Sign Up');
   const [formData, setFormData] = useState({
     fullName: '',

@@ -1,33 +1,19 @@
-// /* eslint-disable react/prop-types */
-// import { createContext, useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { createContext, useState } from "react";
 
-// export const AppContent = createContext();
+export const AppContent = createContext();
 
-// export const AppContextProvider = ({ children }) => {
-//   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-//   const [isLoggedin, setIsLoggedin] = useState(false);
-//   const [userData, setUserData] = useState(null);
+export const AppContextProvider = ( props ) => {
 
-//   // Check authentication status on mount
-//   useEffect(() => {
-//     const token = localStorage.getItem('token');
-//     if (token) {
-//       setIsLoggedin(true);
-//       // Optionally fetch user data here
-//     }
-//   }, []);
-
-//   const value = {
-//     backendUrl,
-//     isLoggedin,
-//     setIsLoggedin,
-//     userData,
-//     setUserData
-//   };
-
-//   return (
-//     <AppContent.Provider value={value}>
-//       {children}
-//     </AppContent.Provider>
-//   );
-// };
+    const backendUrl = import.meta.env.REACT_APP_BACKEND_URL
+    const [isLoggedin, setIsLoggedin ] = useState(false)
+    const [ useData , setUserData] = useState(false)
+    const value = {
+        backendUrl, isLoggedin, setIsLoggedin, useData, setUserData
+    }
+    return (
+        <AppContent.Provider value={value}>
+            {props.children}
+        </AppContent.Provider>
+    )
+}
