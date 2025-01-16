@@ -1,17 +1,16 @@
 /* eslint-disable no-unused-vars */
-import React, { useState,useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import { AppContent } from '../contex/AppContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
-
-  const {backendUrl,setIsLoggedin} = useContext(AppContent)
-
-
+  const { backendUrl, setIsLoggedin } = useContext(AppContent);
   const [state, setState] = useState('Sign Up');
   const [formData, setFormData] = useState({
     fullName: '',
@@ -27,19 +26,97 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Add form validation here if needed
-    
-    if (state === 'Login') {
-      // You can add your login logic here
-      // After successful login:
-      navigate('/');
-    } else {
-      // Handle signup logic
-      // After successful signup:
-      navigate('/');
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      
+      // Validate backendUrl exists
+      if (!backendUrl) {
+        toast.error('Backend URL is not configured');
+        return;
+      }
+  
+      // Validate required fields
+      if (!formData.email || !formData.password) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+  
+      // Set axios defaults
+      axios.defaults.withCredentials = true;
+      
+      // Ensure proper URL formatting
+      const apiUrl = backendUrl.endsWith('/') 
+        ? backendUrl.slice(0, -1) 
+        : backendUrl;
+  
+      if (state === 'Sign Up') {
+        // Validate fullName for signup
+        if (!formData.fullName) {
+          toast.error('Please enter your full name');
+          return;
+        }
+  
+        const { data } = await axios.post(
+          `${apiUrl}/api/auth/register`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        if (data.success) {
+          setIsLoggedin(true);
+          navigate('/');
+          toast.success('Registration successful!');
+        } else {
+          toast.error(data.message || 'Registration failed');
+        }
+      } else {
+        // Login flow
+        const { data } = await axios.post(
+          `${apiUrl}/api/auth/login`,
+          {
+            email: formData.email,
+            password: formData.password
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        if (data.success) {
+          setIsLoggedin(true);
+          navigate('/dashboard');
+          toast.success('Login successful!');
+        } else {
+          toast.error(data.message || 'Login failed');
+        }
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+  
+      // Enhanced error handling
+      if (error.response) {
+        // Server responded with an error
+        if (error.response.status === 404) {
+          toast.error('API endpoint not found. Please check your backend URL configuration.');
+        } else if (error.response.status === 401) {
+          toast.error('Invalid credentials');
+        } else {
+          toast.error(error.response.data?.message || 'Authentication failed');
+        }
+      } else if (error.request) {
+        // Request made but no response
+        toast.error('Unable to connect to server. Please check your internet connection.');
+      } else {
+        // Other errors
+        toast.error('An unexpected error occurred');
+      }
     }
   };
 
@@ -90,8 +167,7 @@ const Login = () => {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 
-                    focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
+                  className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
                   placeholder="Enter your full name"
                   required={state === 'Sign Up'}
                 />
@@ -115,8 +191,7 @@ const Login = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 
-                  focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
+                className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
                 placeholder="Enter your email"
                 required
               />
@@ -139,8 +214,7 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 
-                  focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
+                className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
                 placeholder="Enter your password"
                 required
               />
@@ -160,8 +234,7 @@ const Login = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-purple-600 text-white py-2 rounded-full font-semibold 
-              hover:bg-purple-700 transition-colors duration-300 mt-4"
+            className="w-full bg-purple-600 text-white py-2 rounded-full font-semibold hover:bg-purple-700 transition-colors duration-300 mt-4"
           >
             {state === 'Sign Up' ? 'Sign Up' : 'Login'}
           </button>
@@ -174,7 +247,8 @@ const Login = () => {
             <button
               type="button"
               onClick={() => setState(state === 'Sign Up' ? 'Login' : 'Sign Up')}
-              className="ml-2 text-purple-400 hover:text-purple-300 transition-colors">
+              className="ml-2 text-purple-400 hover:text-purple-300 transition-colors"
+            >
               {state === 'Sign Up' ? 'Login here' : 'Sign Up'}
             </button>
           </p>

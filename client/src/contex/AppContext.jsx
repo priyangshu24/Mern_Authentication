@@ -5,7 +5,7 @@ export const AppContent = createContext();
 
 export const AppContextProvider = ( props ) => {
 
-    const backendUrl = import.meta.env.REACT_APP_BACKEND_URL
+    const backendUrl = import.meta.env.VITE_BACKEND_URL
     const [isLoggedin, setIsLoggedin ] = useState(false)
     const [ useData , setUserData] = useState(false)
     const value = {
