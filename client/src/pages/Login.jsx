@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [state, setState] = useState('Sign Up');
   const [formData, setFormData] = useState({
     fullName: '',
@@ -24,6 +25,17 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
+    // Add form validation here if needed
+    
+    if (state === 'Login') {
+      // You can add your login logic here
+      // After successful login:
+      navigate('/');
+    } else {
+      // Handle signup logic
+      // After successful signup:
+      navigate('/');
+    }
   };
 
   return (
@@ -35,13 +47,13 @@ const Login = () => {
       <div className="relative w-full max-w-md mx-auto px-6 py-8 bg-gray-900/90 backdrop-blur-md rounded-xl shadow-xl">
         {/* Logo section with click functionality */}
         <div className="flex justify-center mb-6">
-          <a href="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <img
               src={assets.logo}
               alt="Logo"
               className="w-24 sm:w-28 drop-shadow-xl cursor-pointer"
             />
-          </a>
+          </Link>
         </div>
 
         {/* Text content */}
@@ -133,7 +145,7 @@ const Login = () => {
           {/* Forgot Password Link */}
           <div className="flex justify-center mt-4">
             <Link
-              to="/reset-password" // Redirect to the reset-password page
+              to="/reset-password"
               className="text-gray-400 text-sm font-medium hover:text-gray-300"
             >
               Forgot password?
