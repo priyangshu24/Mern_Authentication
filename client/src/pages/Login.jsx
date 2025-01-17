@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
-import { AppContent } from '../contex/AppContext';
+import { AppContent } from '../context/AppContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -121,29 +121,29 @@ const Login = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center">
+    <div className="relative flex flex-col items-center justify-center min-h-screen">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-400"></div>
 
       {/* Content container */}
-      <div className="relative w-full max-w-md mx-auto px-6 py-8 bg-gray-900/90 backdrop-blur-md rounded-xl shadow-xl">
+      <div className="relative w-full max-w-md px-6 py-8 mx-auto shadow-xl bg-gray-900/90 backdrop-blur-md rounded-xl">
         {/* Logo section with click functionality */}
         <div className="flex justify-center mb-6">
           <Link to="/" className="flex items-center space-x-2">
             <img
               src={assets.logo}
               alt="Logo"
-              className="w-24 sm:w-28 drop-shadow-xl cursor-pointer"
+              className="w-24 cursor-pointer sm:w-28 drop-shadow-xl"
             />
           </Link>
         </div>
 
         {/* Text content */}
-        <div className="text-center mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">
+        <div className="mb-6 text-center">
+          <h2 className="mb-1 text-xl font-bold text-white sm:text-2xl">
             {state === 'Sign Up' ? 'Create Account' : 'Login'}
           </h2>
-          <p className="text-gray-400 text-sm">
+          <p className="text-sm text-gray-400">
             {state === 'Sign Up' ? 'Create a new account' : 'Login to your account'}
           </p>
         </div>
@@ -159,7 +159,7 @@ const Login = () => {
               <div className="flex items-center bg-gray-800 rounded-full">
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="text-gray-500 px-3"
+                  className="px-3 text-gray-500"
                 />
                 <input
                   type="text"
@@ -167,7 +167,7 @@ const Login = () => {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
+                  className="w-full px-3 py-2 text-sm text-white placeholder-gray-500 transition-all bg-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                   placeholder="Enter your full name"
                   required={state === 'Sign Up'}
                 />
@@ -183,7 +183,7 @@ const Login = () => {
             <div className="flex items-center bg-gray-800 rounded-full">
               <FontAwesomeIcon
                 icon={faEnvelope}
-                className="text-gray-500 px-3"
+                className="px-3 text-gray-500"
               />
               <input
                 type="email"
@@ -191,7 +191,7 @@ const Login = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
+                className="w-full px-3 py-2 text-sm text-white placeholder-gray-500 transition-all bg-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                 placeholder="Enter your email"
                 required
               />
@@ -206,7 +206,7 @@ const Login = () => {
             <div className="flex items-center bg-gray-800 rounded-full">
               <FontAwesomeIcon
                 icon={faLock}
-                className="text-gray-500 px-3"
+                className="px-3 text-gray-500"
               />
               <input
                 type="password"
@@ -214,7 +214,7 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 bg-transparent text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm rounded-full"
+                className="w-full px-3 py-2 text-sm text-white placeholder-gray-500 transition-all bg-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                 placeholder="Enter your password"
                 required
               />
@@ -225,7 +225,7 @@ const Login = () => {
           <div className="flex justify-center mt-4">
             <Link
               to="/reset-password"
-              className="text-gray-400 text-sm font-medium hover:text-gray-300"
+              className="text-sm font-medium text-gray-400 hover:text-gray-300"
             >
               Forgot password?
             </Link>
@@ -234,7 +234,7 @@ const Login = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-purple-600 text-white py-2 rounded-full font-semibold hover:bg-purple-700 transition-colors duration-300 mt-4"
+            className="w-full py-2 mt-4 font-semibold text-white transition-colors duration-300 bg-purple-600 rounded-full hover:bg-purple-700"
           >
             {state === 'Sign Up' ? 'Sign Up' : 'Login'}
           </button>
@@ -242,12 +242,12 @@ const Login = () => {
 
         {/* Toggle State */}
         <div className="mt-6 text-center">
-          <p className="text-gray-400 text-sm">
+          <p className="text-sm text-gray-400">
             {state === 'Sign Up' ? 'Already have an account?' : "Don't have an account?"}
             <button
               type="button"
               onClick={() => setState(state === 'Sign Up' ? 'Login' : 'Sign Up')}
-              className="ml-2 text-purple-400 hover:text-purple-300 transition-colors"
+              className="ml-2 text-purple-400 transition-colors hover:text-purple-300"
             >
               {state === 'Sign Up' ? 'Login here' : 'Sign Up'}
             </button>
