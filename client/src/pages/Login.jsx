@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,13 +10,20 @@ import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { backendUrl, setIsLoggedin } = useContext(AppContent);
+  const { backendUrl, setIsLoggedin, setUserData, isLoggedin } = useContext(AppContent);
   const [state, setState] = useState('Sign Up');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
   });
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedin) {
+      navigate('/dashboard');
+    }
+  }, [isLoggedin, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,37 +33,36 @@ const Login = () => {
     }));
   };
 
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      toast.error('Please fill in all required fields');
+      return false;
+    }
+    if (state === 'Sign Up' && !formData.fullName) {
+      toast.error('Please enter your full name');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
       
-      // Validate backendUrl exists
       if (!backendUrl) {
         toast.error('Backend URL is not configured');
         return;
       }
+
+      if (!validateForm()) return;
   
-      // Validate required fields
-      if (!formData.email || !formData.password) {
-        toast.error('Please fill in all required fields');
-        return;
-      }
-  
-      // Set axios defaults
       axios.defaults.withCredentials = true;
       
-      // Ensure proper URL formatting
       const apiUrl = backendUrl.endsWith('/') 
         ? backendUrl.slice(0, -1) 
         : backendUrl;
   
       if (state === 'Sign Up') {
-        // Validate fullName for signup
-        if (!formData.fullName) {
-          toast.error('Please enter your full name');
-          return;
-        }
-  
         const { data } = await axios.post(
           `${apiUrl}/api/auth/register`,
           formData,
@@ -69,13 +75,13 @@ const Login = () => {
         
         if (data.success) {
           setIsLoggedin(true);
-          navigate('/');
+          setUserData(data.user);
+          navigate('/dashboard');
           toast.success('Registration successful!');
         } else {
           toast.error(data.message || 'Registration failed');
         }
       } else {
-        // Login flow
         const { data } = await axios.post(
           `${apiUrl}/api/auth/login`,
           {
@@ -91,6 +97,7 @@ const Login = () => {
         
         if (data.success) {
           setIsLoggedin(true);
+          setUserData(data.user);
           navigate('/dashboard');
           toast.success('Login successful!');
         } else {
@@ -100,9 +107,7 @@ const Login = () => {
     } catch (error) {
       console.error('Auth error:', error);
   
-      // Enhanced error handling
       if (error.response) {
-        // Server responded with an error
         if (error.response.status === 404) {
           toast.error('API endpoint not found. Please check your backend URL configuration.');
         } else if (error.response.status === 401) {
@@ -111,10 +116,8 @@ const Login = () => {
           toast.error(error.response.data?.message || 'Authentication failed');
         }
       } else if (error.request) {
-        // Request made but no response
         toast.error('Unable to connect to server. Please check your internet connection.');
       } else {
-        // Other errors
         toast.error('An unexpected error occurred');
       }
     }
@@ -122,12 +125,9 @@ const Login = () => {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen">
-      {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-400"></div>
 
-      {/* Content container */}
       <div className="relative w-full max-w-md px-6 py-8 mx-auto shadow-xl bg-gray-900/90 backdrop-blur-md rounded-xl">
-        {/* Logo section with click functionality */}
         <div className="flex justify-center mb-6">
           <Link to="/" className="flex items-center space-x-2">
             <img
@@ -138,7 +138,6 @@ const Login = () => {
           </Link>
         </div>
 
-        {/* Text content */}
         <div className="mb-6 text-center">
           <h2 className="mb-1 text-xl font-bold text-white sm:text-2xl">
             {state === 'Sign Up' ? 'Create Account' : 'Login'}
@@ -148,9 +147,7 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Full Name - only for Sign Up */}
           {state === 'Sign Up' && (
             <div className="relative">
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-300">
@@ -175,7 +172,6 @@ const Login = () => {
             </div>
           )}
 
-          {/* Email */}
           <div className="relative">
             <label htmlFor="email" className="block text-sm font-medium text-gray-300">
               Email Address
@@ -198,7 +194,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Password */}
           <div className="relative">
             <label htmlFor="password" className="block text-sm font-medium text-gray-300">
               Password
@@ -221,7 +216,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Forgot Password Link */}
           <div className="flex justify-center mt-4">
             <Link
               to="/reset-password"
@@ -231,7 +225,6 @@ const Login = () => {
             </Link>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full py-2 mt-4 font-semibold text-white transition-colors duration-300 bg-purple-600 rounded-full hover:bg-purple-700"
@@ -240,7 +233,6 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Toggle State */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-400">
             {state === 'Sign Up' ? 'Already have an account?' : "Don't have an account?"}
