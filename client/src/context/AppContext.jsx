@@ -7,18 +7,18 @@ export const AppContent = createContext();
 
 export const AppContextProvider = (props) => {
   console.log('ENV Backend URL:', import.meta.env.VITE_BACKEND_URL);
-  
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const [isLoggedin, setIsLoggedin] = useState(false);
   const [userData, setUserData] = useState(null);
-  
+
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
         const response = await axios.post(`${backendUrl}/api/auth/is-auth`, {}, {
           withCredentials: true
         });
-        
+
         if (response.data.success) {
           setIsLoggedin(true);
           setUserData(response.data.user);
